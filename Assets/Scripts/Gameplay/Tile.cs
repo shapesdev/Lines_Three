@@ -16,6 +16,8 @@ public class Tile : MonoBehaviour
 
     public Claim m_ClaimedBy;
 
+    public bool HasSouthNeighbor() => m_South != null;
+
     public static void MakeNeighborsSouthNorth(Tile south, Tile north) {
         north.m_South = south;
         south.m_North = north;

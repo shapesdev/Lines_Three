@@ -9,7 +9,7 @@ public class Grid : MonoBehaviour
     private Tile m_TilePrefab;
 
     [SerializeField, Range(5, 13)]
-    [Header("Grid Settings")]
+    [Header("Settings")]
     private int m_GridSize = 5;
     [SerializeField]
     private int m_Spacing;
@@ -17,19 +17,37 @@ public class Grid : MonoBehaviour
     private Tile[,] m_Tiles;
     private Camera m_Camera;
 
-    void Start()
-    {
-        Init();
-    }
-
-    private void Init() {
+    public void Init() {
         m_Camera = Camera.main;
         m_Tiles = new Tile[m_GridSize, m_GridSize];
         GenerateRhombusGrid();
-        SetupCamera();
+        InitCamera();
     }
 
-    private void SetupCamera() {
+    public List<Vector3> GetDrawSpots() {
+        List<Vector3> drawSpots = new List<Vector3>();
+        for (int i = 0; i < m_GridSize; i++) {
+            for (int j = 0; j < m_GridSize; j++) {
+                if (m_Tiles[j, i] != null) {
+                    var tilePos = m_Tiles[j, i].transform.localPosition;
+                    tilePos.y += 0.6f;
+                    var botRight = new Vector3(tilePos.x + 0.5f, tilePos.y, tilePos.z + -0.5f);
+                    var botLeft = new Vector3(tilePos.x - 0.5f, tilePos.y, tilePos.z - 0.5f);
+                    if (m_Tiles[j, i].HasSouthNeighbor()) {
+                        if(!drawSpots.Contains(botLeft)) {
+                            drawSpots.Add(botLeft);
+                        }
+                        if (!drawSpots.Contains(botRight)) {
+                            drawSpots.Add(botRight);
+                        }
+                    }
+                }
+            }
+        }
+        return drawSpots;
+    }
+
+    private void InitCamera() {
         Vector3 centerPos = m_Tiles[m_GridSize / 2, m_GridSize / 2].transform.localPosition;
         float orthoSize = m_GridSize / 2 + 1;
         m_Camera.transform.localPosition = new Vector3(centerPos.x, m_Camera.transform.localPosition.y, centerPos.z);
