@@ -8,7 +8,7 @@ public class Grid : MonoBehaviour
     [SerializeField]
     private Tile m_TilePrefab;
 
-    [SerializeField, Range(5, 13)]
+    [SerializeField, Range(5, 19)]
     [Header("Settings")]
     private int m_GridSize = 5;
     [SerializeField]

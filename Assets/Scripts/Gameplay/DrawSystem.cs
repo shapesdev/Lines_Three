@@ -11,6 +11,8 @@ public class DrawSystem : MonoBehaviour
     [Header("Settings"), Range(1, 5)]
     [SerializeField]
     private int m_LineWidth = 2;
+    [SerializeField]
+    private float m_MaxLineTolerance;
 
     private List<Line> m_Lines;
     private List<Vector3> m_StartingPoints;
@@ -18,7 +20,7 @@ public class DrawSystem : MonoBehaviour
     private Line m_CurrentLine;
 
     private Vector3 m_StartPoint = Vector3.zero;
-    private float x, z;
+    private float m_LineCorrection = 0.05f;
     private bool m_CanMoveX = false;
     private bool m_CanDraw = false;
 
@@ -30,16 +32,15 @@ public class DrawSystem : MonoBehaviour
 
     private void Update() {
         if(Input.GetMouseButtonDown(0)) {
-            Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit)) {
-                if(hit.collider.tag == "Tile") {
-                    StartDraw();
-                }
+            if(IsWithinGrid()) {
+                StartDraw();
             }
         }
         if(m_CanDraw) {
             if (Input.GetMouseButton(0)) {
-                UpdateDraw();
+                if(IsWithinGrid()) {
+                    UpdateDraw();
+                }
             }
             if (Input.GetMouseButtonUp(0)) {
                 EndDraw();
@@ -49,14 +50,14 @@ public class DrawSystem : MonoBehaviour
     
     private void StartDraw() {
         m_CanDraw = true;
+        float shortestDistance = int.MaxValue;
+        Vector3 shortestPoint = Vector3.zero;
+        Vector3 mousePos = m_Camera.ScreenToWorldPoint(Input.mousePosition);
+
         m_CurrentLine = Instantiate(m_LinePrefab, transform, false);
         m_CurrentLine.transform.position = Vector3.zero;
         m_Lines.Add(m_CurrentLine);
 
-        Vector3 shortestPoint = Vector3.zero;
-        float shortestDistance = 10000;
-
-        var mousePos = m_Camera.ScreenToWorldPoint(Input.mousePosition);
         foreach (var point in m_StartingPoints) {
             var dist = Vector3.Distance(point, mousePos);
             if (dist < shortestDistance) {
@@ -64,17 +65,12 @@ public class DrawSystem : MonoBehaviour
                 shortestDistance = dist;
             }
         }
-
         //m_StartPoint = new Vector3(mousePos.x, 1, mousePos.z); // Uses current mouse position, previous solution
         m_StartPoint = new Vector3(shortestPoint.x, 1, shortestPoint.z);
         m_CurrentLine.StartDraw(m_StartPoint);
     }
 
-    private void EndDraw() {
-        //m_Line.EndDraw();
-        m_CanMoveX = false;
-        m_CanDraw = false;
-    }
+    private float x, z;
 
     private void UpdateDraw() {
         float h = Mathf.Abs(Input.GetAxis("Mouse X"));
@@ -96,5 +92,30 @@ public class DrawSystem : MonoBehaviour
             x = m_StartPoint.x;
         }
         m_CurrentLine.Draw(new Vector3(x, 1, z));
+    }
+
+    private void EndDraw() {
+        Vector3 endPos = m_CurrentLine.GetPosition(1);
+        float result;
+
+        if (m_CanMoveX) result = Mathf.Abs(endPos.x - m_StartPoint.x);
+        else result = Mathf.Abs(endPos.z - m_StartPoint.z);
+
+        if (result < m_LineWidth - m_MaxLineTolerance) {
+            Destroy(m_CurrentLine.gameObject);
+            Debug.LogWarning("Too short"); // TODO: Add visual feedback to user
+        }
+        m_CanMoveX = false;
+        m_CanDraw = false;
+    }
+
+    private bool IsWithinGrid() {
+        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit)) {
+            if (hit.collider.tag == "Tile") {
+                return true;
+            }
+        }
+        return false;
     }
 }

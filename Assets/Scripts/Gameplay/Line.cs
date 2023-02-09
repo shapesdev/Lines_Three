@@ -26,4 +26,8 @@ public class Line : MonoBehaviour
         m_LineRenderer.positionCount = 2;
         m_LineRenderer.SetPosition(1, pos);
     }
+
+    public Vector3 GetPosition(int n) {
+        return m_LineRenderer.GetPosition(n);
+    }
 }
