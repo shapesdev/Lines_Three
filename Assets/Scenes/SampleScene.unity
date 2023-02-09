@@ -390,7 +390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TilePrefab: {fileID: -975060641009583309, guid: 6b157650e9765d546859a95a59489a69, type: 3}
-  m_GridSize: 9
+  m_GridSize: 13
   m_Spacing: 1
 --- !u!1 &1915259404
 GameObject:

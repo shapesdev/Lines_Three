@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum Claim
 {
@@ -13,10 +14,12 @@ public class Tile : MonoBehaviour
     private Tile m_East;
     private Tile m_West;
     private Tile m_South;
+    private bool m_IsEdgeTile;
 
     public Claim m_ClaimedBy;
 
     public bool HasSouthNeighbor() => m_South != null;
+    public bool IsEdgeTile { get { return m_IsEdgeTile; } set { m_IsEdgeTile = value; } }
 
     public static void MakeNeighborsSouthNorth(Tile south, Tile north) {
         north.m_South = south;

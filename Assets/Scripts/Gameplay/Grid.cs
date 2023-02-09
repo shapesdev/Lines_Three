@@ -70,6 +70,9 @@ public class Grid : MonoBehaviour
                         if(i > 0 && m_Tiles[j, i - 1] != null) {
                             Tile.MakeNeighborsSouthNorth(tile, m_Tiles[j, i - 1]);
                         }
+                        if (n == 0 || n == tileCount - 1) {
+                            tile.IsEdgeTile = true;
+                        }
                     }
                     tempX += m_Spacing;
                     n++;
