@@ -2,6 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Direction
+{
+    None, North, East, South, West
+}
+
+public struct DrawSpot
+{
+    public Direction Direction;
+    public Vector3 Position;
+}
+
 public class Grid : MonoBehaviour
 {
     [Header("References")]
@@ -24,8 +35,8 @@ public class Grid : MonoBehaviour
         InitCamera();
     }
 
-    public List<Vector3> GetDrawSpots() {
-        List<Vector3> drawSpots = new List<Vector3>();
+    public List<DrawSpot> GetDrawSpots() {
+        List<DrawSpot> drawSpots = new List<DrawSpot>();
         for (int i = 0; i < m_GridSize; i++) {
             for (int j = 0; j < m_GridSize; j++) {
                 if (m_Tiles[j, i] != null) {
@@ -34,12 +45,25 @@ public class Grid : MonoBehaviour
                     var botRight = new Vector3(tilePos.x + 0.5f, tilePos.y, tilePos.z + -0.5f);
                     var botLeft = new Vector3(tilePos.x - 0.5f, tilePos.y, tilePos.z - 0.5f);
                     if (m_Tiles[j, i].HasSouthNeighbor()) {
-                        if(!drawSpots.Contains(botLeft)) {
-                            drawSpots.Add(botLeft);
+                        DrawSpot drawSpot = new DrawSpot();
+                        bool hasLeft = false, hasRight = false;
+                        foreach(var spot in drawSpots) {
+                            if(spot.Position == botLeft) {
+                                hasLeft = true;
+                            }
+                            else if(spot.Position == botRight) {
+                                hasRight = true;
+                            }
                         }
-                        if (!drawSpots.Contains(botRight)) {
-                            drawSpots.Add(botRight);
+
+                        if(!hasRight) {
+                            drawSpot.Position = botRight;
                         }
+                        else if(!hasLeft) {
+                            drawSpot.Position = botLeft;
+                        }
+                        drawSpot.Direction = Direction.East;
+                        drawSpots.Add(drawSpot);
                     }
                 }
             }
