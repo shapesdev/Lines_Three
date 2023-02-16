@@ -45,7 +45,6 @@ public class Grid : MonoBehaviour
                     var botRight = new Vector3(tilePos.x + 0.5f, tilePos.y, tilePos.z + -0.5f);
                     var botLeft = new Vector3(tilePos.x - 0.5f, tilePos.y, tilePos.z - 0.5f);
                     if (m_Tiles[j, i].HasSouthNeighbor()) {
-                        DrawSpot drawSpot = new DrawSpot();
                         bool hasLeft = false, hasRight = false;
                         foreach(var spot in drawSpots) {
                             if(spot.Position == botLeft) {
@@ -57,13 +56,15 @@ public class Grid : MonoBehaviour
                         }
 
                         if(!hasRight) {
+                            DrawSpot drawSpot = new DrawSpot();
                             drawSpot.Position = botRight;
+                            drawSpots.Add(drawSpot);
                         }
-                        else if(!hasLeft) {
+                        if(!hasLeft) {
+                            DrawSpot drawSpot = new DrawSpot();
                             drawSpot.Position = botLeft;
+                            drawSpots.Add(drawSpot);
                         }
-                        drawSpot.Direction = Direction.East;
-                        drawSpots.Add(drawSpot);
                     }
                 }
             }
@@ -94,9 +95,9 @@ public class Grid : MonoBehaviour
                         if(i > 0 && m_Tiles[j, i - 1] != null) {
                             Tile.MakeNeighborsSouthNorth(tile, m_Tiles[j, i - 1]);
                         }
-                        if (n == 0 || n == tileCount - 1) {
-                            tile.IsEdgeTile = true;
-                        }
+                    }
+                    if (n == 0 || n == tileCount - 1) {
+                        tile.IsEdgeTile = true;
                     }
                     tempX += m_Spacing;
                     n++;

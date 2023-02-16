@@ -20,7 +20,6 @@ public class DrawSystem : MonoBehaviour
     private Line m_CurrentLine;
 
     private DrawSpot m_StartDrawSpot;
-    private float m_LineCorrection = 0.05f;
     private bool m_CanMoveX = false;
     private bool m_CanDraw = false;
 
@@ -114,7 +113,7 @@ public class DrawSystem : MonoBehaviour
 
         if (result < m_LineWidth - m_MaxLineTolerance) {
             Destroy(m_CurrentLine.gameObject);
-            Debug.LogWarning("Too short"); // TODO: Add visual feedback to user
+            Debug.LogWarning("Too short");
         }
         m_CanMoveX = false;
         m_CanDraw = false;
